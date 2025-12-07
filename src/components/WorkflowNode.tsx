@@ -6,6 +6,7 @@ interface WorkflowNodeProps {
     node: Node;
     isSelected: boolean;
     onNodeClick: (nodeId: string) => void;
+    onNodeDoubleClick: (nodeId: string) => void;
     onNodeDragStart: (e: React.MouseEvent, nodeId: string) => void;
     onNodeDragEnd: (e: React.MouseEvent, nodeId: string) => void;
     onPortMouseDown: (e: React.MouseEvent, nodeId: string, portType: 'input' | 'output') => void;
@@ -41,6 +42,7 @@ export default function WorkflowNode({
     node,
     isSelected,
     onNodeClick,
+    onNodeDoubleClick,
     onNodeDragStart,
     onNodeDragEnd,
     onPortMouseDown,
@@ -79,6 +81,11 @@ export default function WorkflowNode({
         }
     };
 
+    const handleDoubleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onNodeDoubleClick(node.id);
+    };
+
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
         onDeleteNode(node.id);
@@ -111,6 +118,7 @@ export default function WorkflowNode({
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
         >
             {/* Input Port */}
             <div

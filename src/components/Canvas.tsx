@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import type { Node, Connection, NodeType, CanvasState } from '../types';
+import type { Node, Connection, NodeType, CanvasState, NodeConfig } from '../types';
 import WorkflowNode from './WorkflowNode';
+import NodeConfigPanel from './NodeConfigPanel';
 import './Canvas.css';
 
 interface CanvasProps {
@@ -24,6 +25,13 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
     const [connectionDragEnd, setConnectionDragEnd] = useState<{ x: number; y: number } | null>(null);
 
     const canvasRef = useRef<HTMLDivElement>(null);
+
+    // Config panel state - store nodeId instead of full node to avoid stale data
+    const [configPanelOpen, setConfigPanelOpen] = useState(false);
+    const [configNodeId, setConfigNodeId] = useState<string | null>(null);
+
+    // Get current node data from nodes array (always fresh)
+    const configNode = configNodeId ? nodes.find(n => n.id === configNodeId) || null : null;
 
     // Handle drop from node library
     const handleDrop = (e: React.DragEvent) => {
@@ -200,15 +208,50 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
         setSelectedNodeId(null);
     };
 
+    // Handle node double-click to open config
+    const handleNodeDoubleClick = (nodeId: string) => {
+        setConfigNodeId(nodeId);
+        setConfigPanelOpen(true);
+    };
+
+    // Handle config save
+    const handleConfigSave = (nodeId: string, config: NodeConfig) => {
+        const updatedNodes = nodes.map(node =>
+            node.id === nodeId ? { ...node, data: config } : node
+        );
+        onNodesChange(updatedNodes);
+    };
+
     // Get node position in screen coordinates
     const getNodeScreenPosition = (nodeId: string) => {
         const node = nodes.find(n => n.id === nodeId);
         if (!node) return { x: 0, y: 0 };
 
         return {
-            x: node.position.x * canvasState.zoom + canvasState.panX + 100, // 100 is half node width
-            y: node.position.y * canvasState.zoom + canvasState.panY + 50   // Approximate center
+            x: node.position.x * canvasState.zoom + canvasState.panX,
+            y: node.position.y * canvasState.zoom + canvasState.panY
         };
+    };
+
+    // Get exact port position in screen coordinates
+    const getPortPosition = (nodeId: string, portType: 'input' | 'output') => {
+        const nodePos = getNodeScreenPosition(nodeId);
+        const nodeWidth = 200; // Width of workflow-node
+        const nodeHeight = 120; // Approximate height based on content
+
+        if (portType === 'output') {
+            // Output port is on the right side, middle
+            return {
+                x: nodePos.x + nodeWidth,
+                y: nodePos.y + nodeHeight / 2
+            };
+        } else {
+            // Input port is on the left side, middle
+            return {
+                x: nodePos.x,
+                y: nodePos.y + nodeHeight / 2
+            };
+        }
     };
 
     // Generate SVG path for connection
@@ -243,6 +286,7 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                         node={node}
                         isSelected={selectedNodeId === node.id}
                         onNodeClick={setSelectedNodeId}
+                        onNodeDoubleClick={handleNodeDoubleClick}
                         onNodeDragStart={handleNodeDragStart}
                         onNodeDragEnd={handleNodeDragEnd}
                         onPortMouseDown={handlePortMouseDown}
@@ -255,10 +299,8 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
             {/* SVG overlay for connections */}
             <svg className="connections-svg">
                 {connections.map(conn => {
-                    const sourcePos = getNodeScreenPosition(conn.sourceNodeId);
-                    const targetPos = getNodeScreenPosition(conn.targetNodeId);
-                    sourcePos.x += 100; // Adjust for output port position
-                    targetPos.x -= 100; // Adjust for input port position
+                    const sourcePos = getPortPosition(conn.sourceNodeId, 'output');
+                    const targetPos = getPortPosition(conn.targetNodeId, 'input');
 
                     return (
                         <path
@@ -307,7 +349,16 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                 <div className="instruction-item">🔗 Drag from port to port to connect</div>
                 <div className="instruction-item">🖐️ Drag canvas to pan</div>
                 <div className="instruction-item">🔍 Scroll to zoom</div>
+                <div className="instruction-item">⚙️ Double-click node to configure</div>
             </div>
+
+            {/* Configuration Panel */}
+            <NodeConfigPanel
+                open={configPanelOpen}
+                node={configNode}
+                onClose={() => setConfigPanelOpen(false)}
+                onSave={handleConfigSave}
+            />
         </div>
     );
 }

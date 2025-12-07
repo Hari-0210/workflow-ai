@@ -6,17 +6,15 @@ export interface Position {
 export interface Node {
     id: string;
     type: string;
-    position: Position;
+    position: { x: number; y: number };
     label: string;
-    data?: any;
+    data: NodeConfig;
 }
 
 export interface Connection {
     id: string;
     sourceNodeId: string;
     targetNodeId: string;
-    sourcePort?: string;
-    targetPort?: string;
 }
 
 export interface NodeType {
@@ -32,4 +30,28 @@ export interface CanvasState {
     zoom: number;
     panX: number;
     panY: number;
+}
+
+export interface NodeConfig {
+    stepId?: number;
+    stepName?: string;
+    type?: 'api' | 'sftp' | 'transform';
+    action?: {
+        parameters?: {
+            method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+            endpoint?: string;
+            reqParameters?: Record<string, any>;
+        };
+    };
+    retry?: {
+        maxAttempts?: number;
+        delaySeconds?: number;
+    };
+    status?: {
+        type?: string;
+        parameters?: any;
+        expectedOutput?: any;
+    };
+    condition?: string;
+    delaySeconds?: number;
 }
