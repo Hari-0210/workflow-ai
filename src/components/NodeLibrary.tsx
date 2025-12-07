@@ -11,14 +11,6 @@ const nodeTypes: NodeType[] = [
         description: 'Start your workflow'
     },
     {
-        type: 'webhook',
-        label: 'Webhook',
-        icon: '🔗',
-        color: 'var(--node-trigger)',
-        category: 'Start',
-        description: 'Receive HTTP requests'
-    },
-    {
         type: 'http',
         label: 'HTTP Request',
         icon: '🌐',
@@ -27,53 +19,13 @@ const nodeTypes: NodeType[] = [
         description: 'Make HTTP requests'
     },
     {
-        type: 'database',
-        label: 'Database',
-        icon: '💾',
-        color: 'var(--node-action)',
-        category: 'Actions',
-        description: 'Query database'
-    },
-    {
-        type: 'email',
-        label: 'Send Email',
+        type: 'sftp',
+        label: 'SFTP Transfer',
         icon: '📧',
         color: 'var(--node-action)',
         category: 'Actions',
         description: 'Send email notifications'
     },
-    {
-        type: 'condition',
-        label: 'Condition',
-        icon: '🔀',
-        color: 'var(--node-condition)',
-        category: 'Logic',
-        description: 'Branch workflow logic'
-    },
-    {
-        type: 'filter',
-        label: 'Filter',
-        icon: '🔍',
-        color: 'var(--node-condition)',
-        category: 'Logic',
-        description: 'Filter data items'
-    },
-    {
-        type: 'transform',
-        label: 'Transform',
-        icon: '🔄',
-        color: 'var(--node-transform)',
-        category: 'Data',
-        description: 'Transform data'
-    },
-    {
-        type: 'merge',
-        label: 'Merge',
-        icon: '🔗',
-        color: 'var(--node-transform)',
-        category: 'Data',
-        description: 'Merge multiple inputs'
-    }
 ];
 
 const categories = ['Start', 'Actions', 'Logic', 'Data'];

@@ -56,7 +56,7 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
     };
 
     // Handle node dragging
-    const handleNodeDragStart = (e: React.DragEvent, nodeId: string) => {
+    const handleNodeDragStart = (e: React.MouseEvent, nodeId: string) => {
         setDraggedNodeId(nodeId);
         const node = nodes.find(n => n.id === nodeId);
         if (node && canvasRef.current) {
@@ -65,21 +65,16 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
             const offsetY = (e.clientY - rect.top - canvasState.panY) / canvasState.zoom - node.position.y;
             setDragOffset({ x: offsetX, y: offsetY });
         }
-        e.dataTransfer.effectAllowed = 'move';
-        // Prevent default drag image
-        const img = new Image();
-        img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-        e.dataTransfer.setDragImage(img, 0, 0);
     };
 
-    const handleNodeDragEnd = (e: React.DragEvent, nodeId: string) => {
+    const handleNodeDragEnd = (e: React.MouseEvent) => {
         if (canvasRef.current && draggedNodeId) {
             const rect = canvasRef.current.getBoundingClientRect();
             const x = (e.clientX - rect.left - canvasState.panX) / canvasState.zoom - dragOffset.x;
             const y = (e.clientY - rect.top - canvasState.panY) / canvasState.zoom - dragOffset.y;
 
             const updatedNodes = nodes.map(node =>
-                node.id === nodeId ? { ...node, position: { x, y } } : node
+                node.id === draggedNodeId ? { ...node, position: { x, y } } : node
             );
             onNodesChange(updatedNodes);
         }
@@ -104,6 +99,18 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
             }));
         }
 
+        // Update node position in real-time while dragging
+        if (draggedNodeId && canvasRef.current) {
+            const rect = canvasRef.current.getBoundingClientRect();
+            const x = (e.clientX - rect.left - canvasState.panX) / canvasState.zoom - dragOffset.x;
+            const y = (e.clientY - rect.top - canvasState.panY) / canvasState.zoom - dragOffset.y;
+
+            const updatedNodes = nodes.map(node =>
+                node.id === draggedNodeId ? { ...node, position: { x, y } } : node
+            );
+            onNodesChange(updatedNodes);
+        }
+
         // Update connection drag line
         if (isDraggingConnection && canvasRef.current) {
             const rect = canvasRef.current.getBoundingClientRect();
@@ -116,6 +123,7 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
 
     const handleMouseUp = () => {
         setIsPanning(false);
+        setDraggedNodeId(null);
 
         // End connection drag
         if (isDraggingConnection) {

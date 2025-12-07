@@ -8,6 +8,8 @@ import './App.css';
 function App() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
+  console.log("nodes", nodes);
+  console.log("connections", connections);
 
   return (
     <div className="app">

@@ -7,9 +7,16 @@
     border: 2px solid var(--glass-border);
     border-radius: var(--border-radius);
     cursor: grab;
-    transition: all var(--transition-normal);
-    user-select: none;
     box-shadow: var(--shadow-md);
+    user-select: none;
+    will-change: transform;
+}
+
+.workflow-node.dragging {
+    cursor: grabbing;
+    opacity: 0.9;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg), 0 0 30px var(--node-color);
 }
 
 .workflow-node:hover {

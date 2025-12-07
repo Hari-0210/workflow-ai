@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Node } from '../types';
 import './WorkflowNode.css';
 
@@ -5,8 +6,8 @@ interface WorkflowNodeProps {
     node: Node;
     isSelected: boolean;
     onNodeClick: (nodeId: string) => void;
-    onNodeDragStart: (e: React.DragEvent, nodeId: string) => void;
-    onNodeDragEnd: (e: React.DragEvent, nodeId: string) => void;
+    onNodeDragStart: (e: React.MouseEvent, nodeId: string) => void;
+    onNodeDragEnd: (e: React.MouseEvent, nodeId: string) => void;
     onPortMouseDown: (e: React.MouseEvent, nodeId: string, portType: 'input' | 'output') => void;
     onPortMouseUp: (e: React.MouseEvent, nodeId: string, portType: 'input' | 'output') => void;
     onDeleteNode: (nodeId: string) => void;
@@ -48,20 +49,34 @@ export default function WorkflowNode({
 }: WorkflowNodeProps) {
     const icon = nodeIcons[node.type] || '📦';
     const color = nodeColors[node.type] || 'var(--node-action)';
+    const [isDragging, setIsDragging] = useState(false);
 
-    const handleDragStart = (e: React.DragEvent) => {
+    const handleMouseDown = (e: React.MouseEvent) => {
+        // Don't start drag if clicking on port or delete button
+        if ((e.target as HTMLElement).closest('.node-port') ||
+            (e.target as HTMLElement).closest('.node-delete')) {
+            return;
+        }
+
         e.stopPropagation();
+        setIsDragging(true);
+        onNodeClick(node.id);
         onNodeDragStart(e, node.id);
     };
 
-    const handleDragEnd = (e: React.DragEvent) => {
-        e.stopPropagation();
-        onNodeDragEnd(e, node.id);
+    const handleMouseUp = (e: React.MouseEvent) => {
+        if (isDragging) {
+            e.stopPropagation();
+            setIsDragging(false);
+            onNodeDragEnd(e, node.id);
+        }
     };
 
     const handleClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        onNodeClick(node.id);
+        if (!isDragging) {
+            e.stopPropagation();
+            onNodeClick(node.id);
+        }
     };
 
     const handleDelete = (e: React.MouseEvent) => {
@@ -87,15 +102,14 @@ export default function WorkflowNode({
 
     return (
         <div
-            className={`workflow-node ${isSelected ? 'selected' : ''}`}
+            className={`workflow-node ${isSelected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
             style={{
                 left: `${node.position.x}px`,
                 top: `${node.position.y}px`,
                 '--node-color': color
             } as React.CSSProperties}
-            draggable
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
             onClick={handleClick}
         >
             {/* Input Port */}
