@@ -1,5 +1,5 @@
 import type { NodeType } from '../types';
-import './NodeLibrary.css';
+import '../styles/components/NodeLibrary.css';
 
 const nodeTypes: NodeType[] = [
     {

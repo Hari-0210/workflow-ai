@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Node } from '../types';
-import './WorkflowNode.css';
+import { NODE_ICONS, NODE_COLORS, DEFAULT_NODE_ICON, DEFAULT_NODE_COLOR } from '../constants/nodeTypes';
+import '../styles/components/WorkflowNode.css';
 
 interface WorkflowNodeProps {
     node: Node;
@@ -15,30 +16,6 @@ interface WorkflowNodeProps {
     onDeleteNode: (nodeId: string) => void;
 }
 
-const nodeIcons: Record<string, string> = {
-    trigger: '⚡',
-    webhook: '🔗',
-    http: '🌐',
-    database: '💾',
-    email: '📧',
-    condition: '🔀',
-    filter: '🔍',
-    transform: '🔄',
-    merge: '🔗'
-};
-
-const nodeColors: Record<string, string> = {
-    trigger: 'var(--node-trigger)',
-    webhook: 'var(--node-trigger)',
-    http: 'var(--node-action)',
-    database: 'var(--node-action)',
-    email: 'var(--node-action)',
-    condition: 'var(--node-condition)',
-    filter: 'var(--node-condition)',
-    transform: 'var(--node-transform)',
-    merge: 'var(--node-transform)'
-};
-
 export default function WorkflowNode({
     node,
     isSelected,
@@ -51,8 +28,8 @@ export default function WorkflowNode({
     onPortMouseUp,
     onDeleteNode
 }: WorkflowNodeProps) {
-    const icon = nodeIcons[node.type] || '📦';
-    const color = nodeColors[node.type] || 'var(--node-action)';
+    const icon = NODE_ICONS[node.type] || DEFAULT_NODE_ICON;
+    const color = NODE_COLORS[node.type] || DEFAULT_NODE_COLOR;
     const [isDragging, setIsDragging] = useState(false);
 
     const handleMouseDown = (e: React.MouseEvent) => {

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Canvas from './components/Canvas';
 import NodeLibrary from './components/NodeLibrary';
 import type { Node, Connection } from './types';
-import './index.css';
-import './App.css';
+import './styles/index.css';
+import './styles/App.css';
 
 function App() {
   const [nodes, setNodes] = useState<Node[]>([]);

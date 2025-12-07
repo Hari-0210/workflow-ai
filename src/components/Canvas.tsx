@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import type { Node, Connection, NodeType, CanvasState, NodeConfig } from '../types';
 import WorkflowNode from './WorkflowNode';
 import NodeConfigPanel from './NodeConfigPanel';
-import './Canvas.css';
+import '../styles/components/Canvas.css';
 
 interface CanvasProps {
     nodes: Node[];

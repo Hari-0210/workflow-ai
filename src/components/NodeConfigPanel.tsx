@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import type { Node, NodeConfig } from '../types';
 import FormField from './common/FormField';
-import './NodeConfigPanel.css';
+import '../styles/components/NodeConfigPanel.css';
 
 interface NodeConfigPanelProps {
     open: boolean;
