@@ -33,6 +33,9 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
     // Get current node data from nodes array (always fresh)
     const configNode = configNodeId ? nodes.find(n => n.id === configNodeId) || null : null;
 
+    // Execution state
+    const [isExecuting, setIsExecuting] = useState(false);
+
     // Handle drop from node library
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
@@ -222,6 +225,66 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
         onNodesChange(updatedNodes);
     };
 
+    // Mock execution function
+    const executeNode = async (nodeId: string): Promise<void> => {
+        return new Promise((resolve) => {
+            // Update node to running
+            onNodesChange(nodes.map(n =>
+                n.id === nodeId ? { ...n, executionStatus: 'running' as const } : n
+            ));
+
+            // Simulate API call with delay
+            setTimeout(() => {
+                // Update node to completed
+                onNodesChange(nodes.map(n =>
+                    n.id === nodeId ? { ...n, executionStatus: 'completed' as const } : n
+                ));
+                resolve();
+            }, 2000); // 2 second delay per node
+        });
+    };
+
+    // Execute workflow sequentially
+    const executeWorkflow = async (startNodeId: string) => {
+        if (isExecuting) return;
+
+        setIsExecuting(true);
+
+        // Reset all nodes to idle
+        onNodesChange(nodes.map(n => ({ ...n, executionStatus: 'idle' as const })));
+
+        // Build execution order by following connections
+        const executionOrder: string[] = [];
+        const visited = new Set<string>();
+
+        const traverse = (nodeId: string) => {
+            if (visited.has(nodeId)) return;
+            visited.add(nodeId);
+            executionOrder.push(nodeId);
+
+            // Find all connections from this node
+            const outgoingConnections = connections.filter(c => c.sourceNodeId === nodeId);
+            outgoingConnections.forEach(conn => traverse(conn.targetNodeId));
+        };
+
+        traverse(startNodeId);
+
+        // Execute nodes sequentially
+        for (const nodeId of executionOrder) {
+            await executeNode(nodeId);
+        }
+
+        setIsExecuting(false);
+    };
+
+    // Handle workflow execution from Execute button
+    const handleExecuteWorkflow = (nodeId: string) => {
+        const node = nodes.find(n => n.id === nodeId);
+        if (node && node.type === 'trigger') {
+            executeWorkflow(nodeId);
+        }
+    };
+
     // Get node position in screen coordinates
     const getNodeScreenPosition = (nodeId: string) => {
         const node = nodes.find(n => n.id === nodeId);
@@ -287,6 +350,7 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                         isSelected={selectedNodeId === node.id}
                         onNodeClick={setSelectedNodeId}
                         onNodeDoubleClick={handleNodeDoubleClick}
+                        onExecuteWorkflow={handleExecuteWorkflow}
                         onNodeDragStart={handleNodeDragStart}
                         onNodeDragEnd={handleNodeDragEnd}
                         onPortMouseDown={handlePortMouseDown}
@@ -350,6 +414,7 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                 <div className="instruction-item">🖐️ Drag canvas to pan</div>
                 <div className="instruction-item">🔍 Scroll to zoom</div>
                 <div className="instruction-item">⚙️ Double-click node to configure</div>
+                <div className="instruction-item">▶️ Click Execute on Trigger to run workflow</div>
             </div>
 
             {/* Configuration Panel */}

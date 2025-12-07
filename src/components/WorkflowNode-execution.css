@@ -1,0 +1,67 @@
+/* Execution status styles */
+.workflow-node[data-status="running"] {
+    border-color: #f59e0b !important;
+    animation: pulse-running 1.5s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), var(--shadow-md);
+}
+
+.workflow-node[data-status="completed"] {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4), var(--shadow-md);
+}
+
+.workflow-node[data-status="error"] {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), var(--shadow-md);
+}
+
+@keyframes pulse-running {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), var(--shadow-md);
+    }
+
+    50% {
+        box-shadow: 0 0 30px rgba(245, 158, 11, 0.9), var(--shadow-lg);
+    }
+}
+
+/* Execution status indicator */
+.execution-status {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-primary);
+    z-index: 100;
+}
+
+.execution-status.running {
+    background: #f59e0b;
+    animation: pulse-dot 1s ease-in-out infinite;
+}
+
+.execution-status.completed {
+    background: #10b981;
+}
+
+.execution-status.error {
+    background: #ef4444;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}

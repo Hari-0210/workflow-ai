@@ -7,6 +7,7 @@ interface WorkflowNodeProps {
     isSelected: boolean;
     onNodeClick: (nodeId: string) => void;
     onNodeDoubleClick: (nodeId: string) => void;
+    onExecuteWorkflow: (nodeId: string) => void;
     onNodeDragStart: (e: React.MouseEvent, nodeId: string) => void;
     onNodeDragEnd: (e: React.MouseEvent, nodeId: string) => void;
     onPortMouseDown: (e: React.MouseEvent, nodeId: string, portType: 'input' | 'output') => void;
@@ -43,6 +44,7 @@ export default function WorkflowNode({
     isSelected,
     onNodeClick,
     onNodeDoubleClick,
+    onExecuteWorkflow,
     onNodeDragStart,
     onNodeDragEnd,
     onPortMouseDown,
@@ -81,6 +83,11 @@ export default function WorkflowNode({
         }
     };
 
+    const handleExecute = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onExecuteWorkflow(node.id);
+    };
+
     const handleDoubleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         onNodeDoubleClick(node.id);
@@ -115,11 +122,17 @@ export default function WorkflowNode({
                 top: `${node.position.y}px`,
                 '--node-color': color
             } as React.CSSProperties}
+            data-status={node.executionStatus || 'idle'}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
         >
+            {/* Execution Status Indicator */}
+            {node.executionStatus && node.executionStatus !== 'idle' && (
+                <div className={`execution-status ${node.executionStatus}`}></div>
+            )}
+
             {/* Input Port */}
             <div
                 className="node-port node-port-input"
@@ -155,6 +168,17 @@ export default function WorkflowNode({
                     title="Delete node"
                 >
                     ×
+                </button>
+            )}
+
+            {/* Execute Button for Trigger nodes */}
+            {node.type === 'trigger' && (
+                <button
+                    className="node-execute"
+                    onClick={handleExecute}
+                    title="Execute workflow"
+                >
+                    ▶
                 </button>
             )}
         </div>

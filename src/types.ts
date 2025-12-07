@@ -9,6 +9,7 @@ export interface Node {
     position: { x: number; y: number };
     label: string;
     data: NodeConfig;
+    executionStatus?: 'idle' | 'running' | 'completed' | 'error';
 }
 
 export interface Connection {
