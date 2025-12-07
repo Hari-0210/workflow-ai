@@ -1,0 +1,125 @@
+import type { NodeType } from '../types';
+import './NodeLibrary.css';
+
+const nodeTypes: NodeType[] = [
+    {
+        type: 'trigger',
+        label: 'Trigger',
+        icon: '⚡',
+        color: 'var(--node-trigger)',
+        category: 'Start',
+        description: 'Start your workflow'
+    },
+    {
+        type: 'webhook',
+        label: 'Webhook',
+        icon: '🔗',
+        color: 'var(--node-trigger)',
+        category: 'Start',
+        description: 'Receive HTTP requests'
+    },
+    {
+        type: 'http',
+        label: 'HTTP Request',
+        icon: '🌐',
+        color: 'var(--node-action)',
+        category: 'Actions',
+        description: 'Make HTTP requests'
+    },
+    {
+        type: 'database',
+        label: 'Database',
+        icon: '💾',
+        color: 'var(--node-action)',
+        category: 'Actions',
+        description: 'Query database'
+    },
+    {
+        type: 'email',
+        label: 'Send Email',
+        icon: '📧',
+        color: 'var(--node-action)',
+        category: 'Actions',
+        description: 'Send email notifications'
+    },
+    {
+        type: 'condition',
+        label: 'Condition',
+        icon: '🔀',
+        color: 'var(--node-condition)',
+        category: 'Logic',
+        description: 'Branch workflow logic'
+    },
+    {
+        type: 'filter',
+        label: 'Filter',
+        icon: '🔍',
+        color: 'var(--node-condition)',
+        category: 'Logic',
+        description: 'Filter data items'
+    },
+    {
+        type: 'transform',
+        label: 'Transform',
+        icon: '🔄',
+        color: 'var(--node-transform)',
+        category: 'Data',
+        description: 'Transform data'
+    },
+    {
+        type: 'merge',
+        label: 'Merge',
+        icon: '🔗',
+        color: 'var(--node-transform)',
+        category: 'Data',
+        description: 'Merge multiple inputs'
+    }
+];
+
+const categories = ['Start', 'Actions', 'Logic', 'Data'];
+
+export default function NodeLibrary() {
+    const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
+        e.dataTransfer.setData('application/nodeType', JSON.stringify(nodeType));
+        e.dataTransfer.effectAllowed = 'copy';
+    };
+
+    return (
+        <div className="node-library">
+            <div className="node-library-header">
+                <h2 className="gradient-text">Nodes</h2>
+                <p className="node-library-subtitle">Drag to canvas</p>
+            </div>
+
+            <div className="node-library-content">
+                {categories.map(category => {
+                    const categoryNodes = nodeTypes.filter(n => n.category === category);
+                    if (categoryNodes.length === 0) return null;
+
+                    return (
+                        <div key={category} className="node-category">
+                            <h3 className="category-title">{category}</h3>
+                            <div className="node-list">
+                                {categoryNodes.map(nodeType => (
+                                    <div
+                                        key={nodeType.type}
+                                        className="node-template"
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, nodeType)}
+                                        style={{ '--node-color': nodeType.color } as React.CSSProperties}
+                                    >
+                                        <div className="node-template-icon">{nodeType.icon}</div>
+                                        <div className="node-template-info">
+                                            <div className="node-template-label">{nodeType.label}</div>
+                                            <div className="node-template-description">{nodeType.description}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}

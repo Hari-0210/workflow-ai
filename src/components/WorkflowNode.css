@@ -1,0 +1,134 @@
+.workflow-node {
+    position: absolute;
+    width: 200px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    cursor: grab;
+    transition: all var(--transition-normal);
+    user-select: none;
+    box-shadow: var(--shadow-md);
+}
+
+.workflow-node:hover {
+    border-color: var(--node-color);
+    box-shadow: var(--shadow-lg), 0 0 20px var(--node-color);
+    transform: translateY(-2px);
+}
+
+.workflow-node:active {
+    cursor: grabbing;
+}
+
+.workflow-node.selected {
+    border-color: var(--node-color);
+    box-shadow: var(--shadow-lg), 0 0 30px var(--node-color);
+}
+
+.node-content {
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+.node-icon {
+    font-size: 32px;
+    margin-bottom: var(--spacing-sm);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.node-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.node-type {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Connection Ports */
+.node-port {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.node-port-input {
+    top: 50%;
+    left: -12px;
+    transform: translateY(-50%);
+}
+
+.node-port-output {
+    top: 50%;
+    right: -12px;
+    transform: translateY(-50%);
+}
+
+.port-dot {
+    width: 14px;
+    height: 14px;
+    background: var(--bg-tertiary);
+    border: 3px solid var(--node-color);
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    box-shadow: 0 0 0 0 var(--node-color);
+}
+
+.node-port:hover .port-dot {
+    width: 20px;
+    height: 20px;
+    background: var(--node-color);
+    box-shadow: 0 0 16px var(--node-color), 0 0 0 4px rgba(102, 126, 234, 0.2);
+    animation: pulse 1.5s infinite;
+    border-width: 2px;
+}
+
+.node-port:active .port-dot {
+    transform: scale(1.2);
+}
+
+/* Delete Button */
+.node-delete {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    background: var(--node-condition);
+    border: 2px solid var(--bg-primary);
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    line-height: 1;
+    padding: 0;
+    animation: fadeIn 0.2s ease;
+}
+
+.node-delete:hover {
+    background: #ff4444;
+    transform: scale(1.2);
+    box-shadow: 0 0 12px rgba(255, 68, 68, 0.6);
+}
+
+.node-delete:active {
+    transform: scale(0.95);
+}
