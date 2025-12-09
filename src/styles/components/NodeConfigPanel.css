@@ -1,22 +1,38 @@
 .config-panel {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
 .config-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.02);
+    flex-shrink: 0;
+}
+
+.config-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    /* Critical for nested flex scrolling */
+    overflow: hidden;
 }
 
 .config-content {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 0 24px 24px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
+/* Custom scrollbar for config content */
 .config-content::-webkit-scrollbar {
     width: 8px;
 }
@@ -27,19 +43,20 @@
 }
 
 .config-content::-webkit-scrollbar-thumb {
-    background: rgba(102, 126, 234, 0.3);
+    background: rgba(102, 126, 234, 0.5);
     border-radius: 4px;
 }
 
 .config-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(102, 126, 234, 0.5);
+    background: rgba(102, 126, 234, 0.7);
 }
 
 .config-footer {
-    padding: 16px 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    background: rgba(0, 0, 0, 0.2);
+    padding: 20px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
 }

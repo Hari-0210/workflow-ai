@@ -21,23 +21,19 @@ export interface WorkflowJSON {
         stepName: string;
         type: string;
         action: {
-            type: string;
-            method?: string;
-            apiEndpoint?: string;
-            parameters?: {
-                reqParameters?: any;
-            };
+            parameters?: any; // Flexible to support both API and SFTP structures
         };
         retry?: {
-            maxAttempts: number;
-            delaySeconds: number;
+            maxAttempts?: number;
+            delaySeconds?: number;
         };
-        statusCheck?: {
-            type: string;
-            expectedOutput: any;
+        status?: {
+            type?: string;
+            parameters?: any;
+            expectedOutput?: any;
         };
         condition?: string;
-        delayBeforeExecution?: number;
+        delaySeconds?: number;
     }>;
 }
 
@@ -60,22 +56,56 @@ export function exportWorkflow(
 
 /**
  * Export workflow to custom JSON format (matching user's example)
- * Note: This is a simplified version. Full implementation would require
- * proper topological sorting and complete config mapping.
  */
 export function exportToCustomFormat(
-    _nodes: Node[],
-    _connections: Connection[],
+    nodes: Node[],
+    connections: Connection[],
     workflowId: string = '1',
     workflowName: string = 'Workflow'
 ): WorkflowJSON {
-    // TODO: Implement proper topological sort and config mapping
-    // This is a placeholder that returns the basic structure
+    // Build execution order using topological sort
+    const executionOrder: string[] = [];
+    const visited = new Set<string>();
+
+    // Find trigger nodes (starting points)
+    const triggerNodes = nodes.filter(n => n.type === 'trigger');
+
+    // Traverse from each trigger
+    const traverse = (nodeId: string) => {
+        if (visited.has(nodeId)) return;
+        visited.add(nodeId);
+        executionOrder.push(nodeId);
+
+        // Find outgoing connections
+        const outgoing = connections.filter(c => c.sourceNodeId === nodeId);
+        outgoing.forEach(conn => traverse(conn.targetNodeId));
+    };
+
+    triggerNodes.forEach(trigger => traverse(trigger.id));
+
+    // Map nodes to steps
+    const steps = executionOrder
+        .map(nodeId => nodes.find(n => n.id === nodeId))
+        .filter((node): node is Node => node !== undefined)
+        .map(node => {
+            const config = node.data || {};
+
+            return {
+                type: config.type || node.type,
+                stepId: config.stepId || 0,
+                stepName: config.stepName || node.label,
+                action: config.action || {},
+                ...(config.retry && { retry: config.retry }),
+                ...(config.status && { status: config.status }),
+                ...(config.condition && { condition: config.condition }),
+                ...(config.delaySeconds && { delaySeconds: config.delaySeconds }),
+            };
+        });
 
     return {
         workflowId,
         workflowName,
-        steps: [],
+        steps,
     };
 }
 

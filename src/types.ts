@@ -39,6 +39,22 @@ export interface NodeConfig {
     type?: 'api' | 'sftp' | 'transform';
     action?: {
         parameters?: {
+            src?: {
+                type?: 'local' | 'sftp';
+                host?: string;
+                port?: number;
+                username?: string;
+                password?: string;
+                path?: string;
+            }
+            dest?: {
+                type?: 'local' | 'sftp';
+                host?: string;
+                port?: number;
+                username?: string;
+                password?: string;
+                path?: string;
+            }
             method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
             endpoint?: string;
             reqParameters?: Record<string, any>;

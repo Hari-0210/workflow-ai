@@ -1,5 +1,7 @@
 import type { NodeType } from '../types';
 import '../styles/components/NodeLibrary.css';
+import useApi from '../shared/api/useAPi';
+import { useEffect, useState } from 'react';
 
 const nodeTypes: NodeType[] = [
     {
@@ -31,6 +33,24 @@ const nodeTypes: NodeType[] = [
 const categories = ['Start', 'Actions', 'Logic', 'Data'];
 
 export default function NodeLibrary() {
+
+    const { request } = useApi<any>();
+
+    const [existingWorkflow, setExistingWorkflow] = useState<any>([]);
+
+    const fetchWorkflow = async () => {
+        const response = await request({
+            url: 'http://localhost:8081/workflows/list',
+            method: 'GET'
+        });
+        console.log("response", response.data.response);
+        setExistingWorkflow(response.data.response);
+    }
+
+    useEffect(() => {
+        fetchWorkflow()
+    }, [])
+
     const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
         e.dataTransfer.setData('application/nodeType', JSON.stringify(nodeType));
         e.dataTransfer.effectAllowed = 'copy';
@@ -71,6 +91,13 @@ export default function NodeLibrary() {
                         </div>
                     );
                 })}
+            </div>
+            <div>
+                {existingWorkflow.map((workflow: any) => (
+                    <div key={workflow.id}>
+                        <h3>{workflow.name}</h3>
+                    </div>
+                ))}
             </div>
         </div>
     );

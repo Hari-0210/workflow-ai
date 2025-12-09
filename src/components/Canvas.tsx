@@ -146,6 +146,9 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
 
     // Handle zoom
     const handleWheel = (e: React.WheelEvent) => {
+        if (configPanelOpen) {
+            return;
+        }
         e.preventDefault();
         const delta = e.deltaY > 0 ? 0.9 : 1.1;
         const newZoom = Math.min(Math.max(canvasState.zoom * delta, 0.1), 3);

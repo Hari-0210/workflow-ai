@@ -41,7 +41,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 export default function NodeConfigPanel({ open, node, onClose, onSave }: NodeConfigPanelProps) {
     const [tabValue, setTabValue] = useState(0);
 
-    const { control, handleSubmit, reset } = useForm<NodeConfig>({
+    const { control, handleSubmit, reset, watch } = useForm<NodeConfig>({
         defaultValues: {},
     });
     // Reset form with node-specific data when node changes or panel opens
@@ -79,10 +79,18 @@ export default function NodeConfigPanel({ open, node, onClose, onSave }: NodeCon
                     backgroundImage: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(79, 172, 254, 0.05))',
                     backdropFilter: 'blur(20px)',
                     borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    overflow: 'hidden',
                 },
             }}
+            ModalProps={{
+                keepMounted: false,
+                // disableScrollLock: true, // Prevent body scroll lock
+            }}
         >
-            <Box className="config-panel">
+            <Box className="config-panel" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 {/* Header */}
                 <Box className="config-header">
                     <Box>
@@ -121,13 +129,13 @@ export default function NodeConfigPanel({ open, node, onClose, onSave }: NodeCon
                     }}
                 >
                     <Tab label="Basic" />
-                    <Tab label="API" />
+                    <Tab label="Config" />
                     <Tab label="Retry & Status" />
                     <Tab label="Advanced" />
                 </Tabs>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)} className="config-form">
                     <Box className="config-content">
                         {/* Basic Tab */}
                         <TabPanel value={tabValue} index={0}>
@@ -164,38 +172,181 @@ export default function NodeConfigPanel({ open, node, onClose, onSave }: NodeCon
 
                         {/* API Tab */}
                         <TabPanel value={tabValue} index={1}>
-                            <Stack spacing={2.5}>
-                                <FormField
-                                    name="action.parameters.method"
-                                    label="HTTP Method"
-                                    type="select"
-                                    control={control}
-                                    options={[
-                                        { label: 'GET', value: 'GET' },
-                                        { label: 'POST', value: 'POST' },
-                                        { label: 'PUT', value: 'PUT' },
-                                        { label: 'DELETE', value: 'DELETE' },
-                                    ]}
-                                />
-                                <FormField
-                                    name="action.parameters.endpoint"
-                                    label="API Endpoint"
-                                    type="text"
-                                    control={control}
-                                    placeholder="https://api.example.com/endpoint"
-                                />
-                                <FormField
-                                    name="action.parameters.reqParameters"
-                                    label="Request Parameters (JSON)"
-                                    type="textarea"
-                                    control={control}
-                                    rows={8}
-                                    placeholder='{\n  "key": "value"\n}'
-                                />
-                                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: -1 }}>
-                                    💡 Use ${'{'}response.output.path{'}'} to reference previous step outputs
-                                </Typography>
-                            </Stack>
+                            {node.type === 'http' || node.type === 'trigger' ? (
+                                // API Configuration
+                                <Stack spacing={2.5}>
+                                    <FormField
+                                        name="action.parameters.method"
+                                        label="HTTP Method"
+                                        type="select"
+                                        control={control}
+                                        options={[
+                                            { label: 'GET', value: 'GET' },
+                                            { label: 'POST', value: 'POST' },
+                                            { label: 'PUT', value: 'PUT' },
+                                            { label: 'DELETE', value: 'DELETE' },
+                                        ]}
+                                    />
+                                    <FormField
+                                        name="action.parameters.endpoint"
+                                        label="API Endpoint"
+                                        type="text"
+                                        control={control}
+                                        placeholder="https://api.example.com/endpoint"
+                                    />
+                                    <FormField
+                                        name="action.parameters.reqParameters"
+                                        label="Request Parameters (JSON)"
+                                        type="textarea"
+                                        control={control}
+                                        rows={8}
+                                        placeholder='{\n  "key": "value"\n}'
+                                    />
+                                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: -1 }}>
+                                        💡 Use ${'{'}response.output.path{'}'} to reference previous step outputs
+                                    </Typography>
+                                </Stack>
+                            ) : (
+                                // SFTP Configuration
+                                <Stack spacing={3}>
+                                    <Box>
+                                        <Typography variant="subtitle2" sx={{ color: '#fff', mb: 2 }}>
+                                            Operation
+                                        </Typography>
+                                        <FormField
+                                            name="action.parameters.operation"
+                                            label="SFTP Operation"
+                                            type="select"
+                                            control={control}
+                                            options={[
+                                                { label: 'Move', value: 'move' },
+                                                { label: 'Copy', value: 'copy' },
+                                                { label: 'Download', value: 'download' },
+                                                { label: 'Upload', value: 'upload' },
+                                            ]}
+                                        />
+                                    </Box>
+
+                                    <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+
+                                    <Box>
+                                        <Typography variant="subtitle2" sx={{ color: '#fff', mb: 2 }}>
+                                            Source Server
+                                        </Typography>
+                                        <Stack spacing={2.5}>
+                                            <FormField
+                                                name="action.parameters.src.type"
+                                                label="Type"
+                                                type="select"
+                                                control={control}
+                                                options={[
+                                                    { label: 'Local', value: 'local' },
+                                                    { label: 'SFTP', value: 'sftp' },
+                                                ]}
+                                            />
+                                            {watch('action.parameters.src.type') === 'sftp' && (
+                                                <>
+                                                    <FormField
+                                                        name="action.parameters.src.host"
+                                                        label="Host"
+                                                        type="text"
+                                                        control={control}
+                                                        placeholder="10.0.0.1"
+                                                    />
+                                                    <FormField
+                                                        name="action.parameters.src.port"
+                                                        label="Port"
+                                                        type="number"
+                                                        control={control}
+                                                        placeholder="22"
+                                                    />
+                                                    <FormField
+                                                        name="action.parameters.src.username"
+                                                        label="Username"
+                                                        type="text"
+                                                        control={control}
+                                                        placeholder="user1"
+                                                    />
+                                                    <FormField
+                                                        name="action.parameters.src.password"
+                                                        label="Password"
+                                                        type="text"
+                                                        control={control}
+                                                        placeholder="••••••••"
+                                                    />
+                                                </>
+                                            )}
+                                            <FormField
+                                                name="action.parameters.src.path"
+                                                label="Path"
+                                                type="text"
+                                                control={control}
+                                                placeholder="/input/*.csv"
+                                            />
+                                        </Stack>
+                                    </Box>
+
+                                    <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+
+                                    <Box>
+                                        <Typography variant="subtitle2" sx={{ color: '#fff', mb: 2 }}>
+                                            Destination Server
+                                        </Typography>
+                                        <Stack spacing={2.5}>
+                                            <FormField
+                                                name="action.parameters.dest.type"
+                                                label="Type"
+                                                type="select"
+                                                control={control}
+                                                options={[
+                                                    { label: 'Local', value: 'local' },
+                                                    { label: 'SFTP', value: 'sftp' },
+                                                ]}
+                                            />
+                                            {watch('action.parameters.dest.type') as string === 'sftp' && (
+                                                <>
+                                                    <FormField
+                                                        name="action.parameters.dest.host"
+                                                        label="Host"
+                                                        type="text"
+                                                        control={control}
+                                                        placeholder="10.0.0.2"
+                                                    />
+                                                    <FormField
+                                                        name="action.parameters.dest.port"
+                                                        label="Port"
+                                                        type="number"
+                                                        control={control}
+                                                        placeholder="22"
+                                                    />
+                                                    <FormField
+                                                        name="action.parameters.dest.username"
+                                                        label="Username"
+                                                        type="text"
+                                                        control={control}
+                                                        placeholder="user2"
+                                                    />
+                                                    <FormField
+                                                        name="action.parameters.dest.password"
+                                                        label="Password"
+                                                        type="text"
+                                                        control={control}
+                                                        placeholder="••••••••"
+                                                    />
+                                                </>
+                                            )}
+
+                                            <FormField
+                                                name="action.parameters.dest.path"
+                                                label="Path"
+                                                type="text"
+                                                control={control}
+                                                placeholder="/processed/"
+                                            />
+                                        </Stack>
+                                    </Box>
+                                </Stack>
+                            )}
                         </TabPanel>
 
                         {/* Retry & Status Tab */}
