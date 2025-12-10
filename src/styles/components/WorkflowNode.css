@@ -106,8 +106,7 @@
     }
 }
 
-/* Execution status styles */
-.workflow-node[data-status="running"] {
+/* .workflow-node[data-status="running"] {
     border-color: #f59e0b !important;
     border-width: 3px;
     animation: pulse-running 1.5s ease-in-out infinite, shimmer 2s linear infinite;
@@ -120,7 +119,6 @@
     overflow: visible !important;
 }
 
-/* Outer ripple effect */
 .workflow-node[data-status="running"]::before {
     content: '';
     position: absolute;
@@ -135,7 +133,6 @@
     z-index: -1;
 }
 
-/* Progress bar at bottom */
 .workflow-node[data-status="running"]::after {
     content: '';
     position: absolute;
@@ -150,8 +147,8 @@
     animation: progress-bar 2s ease-in-out infinite;
     z-index: 2;
     border-radius: 0 0 var(--border-radius) var(--border-radius);
-}
-
+} */
+/* 
 .workflow-node[data-status="completed"] {
     border-color: #10b981 !important;
     border-width: 3px;
@@ -164,7 +161,6 @@
     overflow: visible !important;
 }
 
-/* Completed checkmark effect */
 .workflow-node[data-status="completed"]::before {
     content: '✓';
     position: absolute;
@@ -182,7 +178,6 @@
     pointer-events: none;
 }
 
-/* Success burst effect */
 .workflow-node[data-status="completed"]::after {
     content: '';
     position: absolute;
@@ -209,7 +204,6 @@
     overflow: visible !important;
 }
 
-/* Error X effect */
 .workflow-node[data-status="error"]::before {
     content: '✕';
     position: absolute;
@@ -227,7 +221,6 @@
     pointer-events: none;
 }
 
-/* Error burst effect */
 .workflow-node[data-status="error"]::after {
     content: '';
     position: absolute;
@@ -240,7 +233,7 @@
     animation: burst-out 0.8s ease-out forwards;
     z-index: -1;
     pointer-events: none;
-}
+} */
 
 @keyframes pulse-running {
 

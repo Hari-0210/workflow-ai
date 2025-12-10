@@ -3,15 +3,18 @@ import type { Node, Connection, NodeType, CanvasState, NodeConfig } from '../typ
 import WorkflowNode from './WorkflowNode';
 import NodeConfigPanel from './NodeConfigPanel';
 import '../styles/components/Canvas.css';
+import useApi from '../shared/api/useAPi';
+import { API_URLS } from '../constants/API_URLS';
 
 interface CanvasProps {
     nodes: Node[];
     connections: Connection[];
     onNodesChange: (nodes: Node[]) => void;
     onConnectionsChange: (connections: Connection[]) => void;
+    workflowId: string | null;
 }
 
-export default function Canvas({ nodes, connections, onNodesChange, onConnectionsChange }: CanvasProps) {
+export default function Canvas({ nodes, connections, onNodesChange, onConnectionsChange, workflowId }: CanvasProps) {
     const [canvasState, setCanvasState] = useState<CanvasState>({ zoom: 1, panX: 0, panY: 0 });
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
     const [isPanning, setIsPanning] = useState(false);
@@ -35,6 +38,72 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
 
     // Execution state
     const [isExecuting, setIsExecuting] = useState(false);
+    const pollingRef = useRef<number | null>(null);
+    const { request } = useApi<any>();
+
+
+    const startWorkflowExecution = async (workflowId: any): Promise<string | null> => {
+        try {
+            const res = await request({
+                endpoint: API_URLS.WORKFLOW.START,
+                body: { workflowId }
+            });
+            syncNodeExecutionStatus(res.data.history);
+            return res.data.runId;
+        } catch (err) {
+            console.error("Workflow start error:", err);
+            return null;
+        }
+    };
+
+    const fetchWorkflowStatus = async (runId: string) => {
+        try {
+            const res = await request({
+                endpoint: API_URLS.WORKFLOW.GET_WORKFLOW_STATUS,
+                body: { runId }
+            });
+            return res.data.response;
+        } catch (err) {
+            console.error("Polling failed:", err);
+            return null;
+        }
+    };
+
+    const startPolling = (runId: string) => {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+
+        pollingRef.current = setInterval(async () => {
+            const statuses = await fetchWorkflowStatus(runId);
+            if (!statuses) return;
+
+            syncNodeExecutionStatus(statuses);
+            const isFail = statuses.some((s: any) => s.status === "FAILED");
+            const allDone = statuses.every((s: any) => s.status === "COMPLETED");
+            if (allDone || isFail) {
+                clearInterval(pollingRef.current!);
+                pollingRef.current = null;
+                setIsExecuting(false);
+            }
+        }, 5000);
+    };
+
+    const syncNodeExecutionStatus = (stepStatusList: any[]) => {
+        const updated = nodes.map(node => {
+            const stepId = node.data?.stepId;
+            const step = stepStatusList.find(s => s.stepId === stepId);
+            if (!step) return node;
+
+            return {
+                ...node,
+                executionStatus:
+                    step.status === "COMPLETED" ? "completed" :
+                        step.status === "RUNNING" ? "running" :
+                            step.status === "FAILED" ? "error" :
+                                "idle"
+            };
+        });
+        onNodesChange(updated);
+    };
 
     // Handle drop from node library
     const handleDrop = (e: React.DragEvent) => {
@@ -228,64 +297,24 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
         onNodesChange(updatedNodes);
     };
 
-    // Mock execution function
-    const executeNode = async (nodeId: string): Promise<void> => {
-        return new Promise((resolve) => {
-            // Update node to running
-            onNodesChange(nodes.map(n =>
-                n.id === nodeId ? { ...n, executionStatus: 'running' as const } : n
-            ));
 
-            // Simulate API call with delay
-            setTimeout(() => {
-                // Update node to completed
-                onNodesChange(nodes.map(n =>
-                    n.id === nodeId ? { ...n, executionStatus: 'completed' as const } : n
-                ));
-                resolve();
-            }, 2000); // 2 second delay per node
-        });
-    };
 
-    // Execute workflow sequentially
-    const executeWorkflow = async (startNodeId: string) => {
+    // Handle workflow execution from Execute button
+    const handleExecuteWorkflow = async (nodeId: string) => {
         if (isExecuting) return;
+        const triggerNode = nodes.find(n => n.id === nodeId);
+        if (!triggerNode) return;
 
         setIsExecuting(true);
 
-        // Reset all nodes to idle
-        onNodesChange(nodes.map(n => ({ ...n, executionStatus: 'idle' as const })));
-
-        // Build execution order by following connections
-        const executionOrder: string[] = [];
-        const visited = new Set<string>();
-
-        const traverse = (nodeId: string) => {
-            if (visited.has(nodeId)) return;
-            visited.add(nodeId);
-            executionOrder.push(nodeId);
-
-            // Find all connections from this node
-            const outgoingConnections = connections.filter(c => c.sourceNodeId === nodeId);
-            outgoingConnections.forEach(conn => traverse(conn.targetNodeId));
-        };
-
-        traverse(startNodeId);
-
-        // Execute nodes sequentially
-        for (const nodeId of executionOrder) {
-            await executeNode(nodeId);
+        // Step 1: backend execute
+        const newRunId = await startWorkflowExecution(workflowId);
+        if (!newRunId) {
+            setIsExecuting(false);
+            return;
         }
 
-        setIsExecuting(false);
-    };
-
-    // Handle workflow execution from Execute button
-    const handleExecuteWorkflow = (nodeId: string) => {
-        const node = nodes.find(n => n.id === nodeId);
-        if (node && node.type === 'trigger') {
-            executeWorkflow(nodeId);
-        }
+        startPolling(newRunId);
     };
 
     // Get node position in screen coordinates
@@ -359,6 +388,7 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                         onPortMouseDown={handlePortMouseDown}
                         onPortMouseUp={handlePortMouseUp}
                         onDeleteNode={handleDeleteNode}
+                        isExecuting={isExecuting}
                     />
                 ))}
             </div>

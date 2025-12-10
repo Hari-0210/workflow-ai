@@ -14,6 +14,7 @@ interface WorkflowNodeProps {
     onPortMouseDown: (e: React.MouseEvent, nodeId: string, portType: 'input' | 'output') => void;
     onPortMouseUp: (e: React.MouseEvent, nodeId: string, portType: 'input' | 'output') => void;
     onDeleteNode: (nodeId: string) => void;
+    isExecuting: boolean;
 }
 
 export default function WorkflowNode({
@@ -26,7 +27,7 @@ export default function WorkflowNode({
     onNodeDragEnd,
     onPortMouseDown,
     onPortMouseUp,
-    onDeleteNode
+    onDeleteNode, isExecuting
 }: WorkflowNodeProps) {
     const icon = NODE_ICONS[node.type] || DEFAULT_NODE_ICON;
     const color = NODE_COLORS[node.type] || DEFAULT_NODE_COLOR;
@@ -154,6 +155,7 @@ export default function WorkflowNode({
                     className="node-execute"
                     onClick={handleExecute}
                     title="Execute workflow"
+                    disabled={isExecuting}
                 >
                     ▶
                 </button>

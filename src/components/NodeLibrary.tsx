@@ -2,6 +2,7 @@ import type { NodeType } from '../types';
 import '../styles/components/NodeLibrary.css';
 import useApi from '../shared/api/useAPi';
 import { useEffect, useState } from 'react';
+import { API_URLS } from '../constants/API_URLS';
 
 const nodeTypes: NodeType[] = [
     {
@@ -45,8 +46,7 @@ export default function NodeLibrary({ onLoadWorkflow }: NodeLibraryProps) {
     const fetchWorkflow = async () => {
         try {
             const response = await request({
-                url: 'http://localhost:8081/workflows/list',
-                method: 'GET'
+                endpoint: API_URLS.WORKFLOW.LIST,
             });
             if (response.data && response.data.response) {
                 setExistingWorkflow(response.data.response);

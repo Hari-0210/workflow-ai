@@ -8,8 +8,11 @@ import './styles/App.css';
 function App() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
 
   const onLoadWorkflow = (workflow: any) => {
+    console.log("workflow", workflow);
+    setWorkflowId(workflow.id);
     const BASE_X = 50, BASE_Y = 100, GAP_X = 250, GAP_Y = 120;
 
     const triggerNode = {
@@ -53,6 +56,7 @@ function App() {
         connections={connections}
         onNodesChange={setNodes}
         onConnectionsChange={setConnections}
+        workflowId={workflowId}
       />
     </div>
   );
