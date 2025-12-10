@@ -32,19 +32,28 @@ const nodeTypes: NodeType[] = [
 
 const categories = ['Start', 'Actions', 'Logic', 'Data'];
 
-export default function NodeLibrary() {
+interface NodeLibraryProps {
+    onLoadWorkflow?: (workflow: any) => void;
+}
+
+export default function NodeLibrary({ onLoadWorkflow }: NodeLibraryProps) {
 
     const { request } = useApi<any>();
 
     const [existingWorkflow, setExistingWorkflow] = useState<any>([]);
 
     const fetchWorkflow = async () => {
-        const response = await request({
-            url: 'http://localhost:8081/workflows/list',
-            method: 'GET'
-        });
-        console.log("response", response.data.response);
-        setExistingWorkflow(response.data.response);
+        try {
+            const response = await request({
+                url: 'http://localhost:8081/workflows/list',
+                method: 'GET'
+            });
+            if (response.data && response.data.response) {
+                setExistingWorkflow(response.data.response);
+            }
+        } catch (error) {
+            console.error("Failed to fetch workflows", error);
+        }
     }
 
     useEffect(() => {
@@ -92,13 +101,21 @@ export default function NodeLibrary() {
                     );
                 })}
             </div>
-            <div>
-                {existingWorkflow.map((workflow: any) => (
-                    <div key={workflow.id}>
-                        <h3>{workflow.name}</h3>
+
+
+            {existingWorkflow.length > 0 && (
+                <div className="workflow-list-section">
+                    <h3 className="category-title">Existing Workflows</h3>
+                    <div className="workflow-list">
+                        {existingWorkflow.map((workflow: any) => (
+                            <div key={workflow.id} className="workflow-item" onClick={() => onLoadWorkflow?.(workflow)}>
+                                <div className="workflow-item-name">{workflow.name}</div>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
+            <br />
         </div>
     );
 }

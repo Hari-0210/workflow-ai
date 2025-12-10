@@ -8,6 +8,7 @@
     display: flex;
     flex-direction: column;
     animation: slideIn 0.4s ease;
+    overflow: scroll;
 }
 
 .node-library-header {
@@ -126,4 +127,44 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Workflow List Styles */
+.workflow-list-section {
+    margin-top: var(--spacing-lg);
+    border-top: 1px solid var(--glass-border);
+    padding-top: var(--spacing-md);
+}
+
+.workflow-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.workflow-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.workflow-item:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.workflow-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.workflow-item-steps {
+    font-size: 11px;
+    color: var(--text-secondary);
 }

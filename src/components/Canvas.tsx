@@ -368,7 +368,6 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                 {connections.map(conn => {
                     const sourcePos = getPortPosition(conn.sourceNodeId, 'output');
                     const targetPos = getPortPosition(conn.targetNodeId, 'input');
-
                     return (
                         <path
                             key={conn.id}
@@ -398,11 +397,19 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
 
                 {/* Gradient definition */}
                 <defs>
-                    <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient
+                        id="connectionGradient"
+                        x1="0"
+                        y1="0"
+                        x2="300"
+                        y2="0"
+                        gradientUnits="userSpaceOnUse"
+                    >
                         <stop offset="0%" stopColor="#667eea" />
                         <stop offset="100%" stopColor="#4facfe" />
                     </linearGradient>
                 </defs>
+
             </svg>
 
             {/* Zoom indicator */}
