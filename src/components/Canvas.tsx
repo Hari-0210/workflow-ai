@@ -40,6 +40,16 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
     const [isExecuting, setIsExecuting] = useState(false);
     const pollingRef = useRef<number | null>(null);
     const { request } = useApi<any>();
+    const [logs, setLogs] = useState<string[]>([]);
+    const appendLog = (entry: any) => {
+        try {
+            const text = typeof entry === 'string' ? entry : JSON.stringify(entry);
+            setLogs(prev => [...prev, text]);
+        } catch {
+            setLogs(prev => [...prev, String(entry)]);
+        }
+    };
+    const clearLogs = () => setLogs([]);
 
 
     const startWorkflowExecution = async (workflowId: any): Promise<string | null> => {
@@ -77,6 +87,7 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
             if (!statuses) return;
 
             syncNodeExecutionStatus(statuses);
+            appendLog(statuses);
             const isFail = statuses.some((s: any) => s.status === "FAILED");
             const allDone = statuses.every((s: any) => s.status === "COMPLETED");
             if (allDone || isFail) {
@@ -455,6 +466,18 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                 <div className="instruction-item">🔍 Scroll to zoom</div>
                 <div className="instruction-item">⚙️ Double-click node to configure</div>
                 <div className="instruction-item">▶️ Click Execute on Trigger to run workflow</div>
+            </div>
+
+            <div className="log-panel" onWheel={(e) => e.stopPropagation()}>
+                <div className="log-header">
+                    <span>Logs</span>
+                    <button className="log-clear" onClick={clearLogs} disabled={!logs.length}>Clear</button>
+                </div>
+                <div className="log-content">
+                    {logs.map((l, i) => (
+                        <pre key={i} className="log-item">{l}</pre>
+                    ))}
+                </div>
             </div>
 
             {/* Configuration Panel */}

@@ -92,3 +92,62 @@
 .instruction-item:last-child {
     margin-bottom: 0;
 }
+
+.log-panel {
+    position: absolute;
+    bottom: var(--spacing-lg);
+    left: var(--spacing-lg);
+    width: 380px;
+    max-height: 40vh;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.log-clear {
+    all: unset;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    padding: 4px 10px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--glass-border);
+}
+
+.log-clear:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.log-content {
+    padding: var(--spacing-sm) var(--spacing-md);
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+
+.log-item {
+    margin: 0 0 var(--spacing-sm) 0;
+    background: rgba(0,0,0,0.2);
+    color: var(--text-primary);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm);
+    font-size: 12px;
+    white-space: pre-wrap;
+}
