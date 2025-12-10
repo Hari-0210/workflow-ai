@@ -34,7 +34,7 @@ export default function MiniDrawer() {
       }}
     >
       <Toolbar sx={{ justifyContent: open ? 'flex-end' : 'center' }}>
-        <IconButton onClick={() => setOpen(!open)} size="small">
+        <IconButton onClick={() => setOpen(!open)} size="small" sx={{ color: 'var(--text-primary)' }}>
           <MenuIcon />
         </IconButton>
       </Toolbar>
@@ -56,7 +56,7 @@ export default function MiniDrawer() {
               <ListItemIcon sx={{ minWidth: 0, mr: open ? 1.5 : 0, color: 'var(--text-primary)' }}>
                 {item.icon}
               </ListItemIcon>
-              {open && <ListItemText primary={item.label} />}
+              {open && <ListItemText primary={item.label} sx={{ color: 'var(--text-primary)' }} />}
             </ListItemButton>
           );
         })}

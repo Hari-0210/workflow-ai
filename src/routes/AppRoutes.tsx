@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Box, Toolbar } from '@mui/material';
+import { Box } from '@mui/material';
 import MiniDrawer from '../components/layout/MiniDrawer';
 import WorkflowBuilderPage from '../pages/WorkflowBuilderPage';
 import WorkflowConfigPage from '../pages/WorkflowConfigPage';
@@ -22,4 +22,3 @@ export default function AppRoutes() {
     </BrowserRouter>
   );
 }
-

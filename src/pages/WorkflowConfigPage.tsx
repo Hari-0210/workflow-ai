@@ -4,20 +4,21 @@ import { useNavigate } from 'react-router-dom';
 import useApi from '../shared/api/useAPi';
 import { API_URLS } from '../constants/API_URLS';
 
-interface WorkflowSummary {
+interface WorkflowItem {
   id: string;
   name: string;
+  config: unknown;
 }
 
 export default function WorkflowConfigPage() {
   const navigate = useNavigate();
   const { request } = useApi<any>();
-  const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowItem[]>([]);
 
   const fetchWorkflows = async () => {
     const response = await request({ endpoint: API_URLS.WORKFLOW.LIST });
     if (response.data && response.data.response) {
-      setWorkflows(response.data.response.map((w: any) => ({ id: w.id, name: w.name })));
+      setWorkflows(response.data.response.map((w: any) => ({ id: w.id, name: w.name, config: w.config })));
     }
   };
 
@@ -25,8 +26,11 @@ export default function WorkflowConfigPage() {
     fetchWorkflows();
   }, []);
 
-  const handleNew = () => navigate('/workflows');
-  const handleEdit = (id: string) => navigate('/workflows');
+  const handleNew = () => navigate('/workflows?mode=edit');
+  const handleEdit = (id: string) => {
+    const wf = workflows.find(w => String(w.id) === String(id));
+    navigate('/workflows?mode=edit', { state: { workflow: wf } });
+  };
   const handleDelete = async (id: string) => {
     await request({ endpoint: API_URLS.WORKFLOW.DELETE, body: { workflowId: id } });
     fetchWorkflows();
@@ -58,4 +62,3 @@ export default function WorkflowConfigPage() {
     </Box>
   );
 }
-

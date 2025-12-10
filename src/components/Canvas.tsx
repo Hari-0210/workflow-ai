@@ -58,8 +58,8 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                 endpoint: API_URLS.WORKFLOW.START,
                 body: { workflowId }
             });
-            syncNodeExecutionStatus(res.data.history);
-            return res.data.runId;
+            syncNodeExecutionStatus(res.data.response.historyList);
+            return res.data.response.runId;
         } catch (err) {
             console.error("Workflow start error:", err);
             return null;
