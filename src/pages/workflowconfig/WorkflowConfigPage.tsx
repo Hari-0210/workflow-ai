@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Box, AppBar, Toolbar, Typography, Button, List, ListItem, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import useApi from '../shared/api/useAPi';
-import { API_URLS } from '../constants/API_URLS';
+import useApi from '../../shared/api/useAPi';
+import { API_URLS } from '../../constants/API_URLS';
 
 interface WorkflowItem {
   id: string;
@@ -15,16 +15,18 @@ export default function WorkflowConfigPage() {
   const { request } = useApi<any>();
   const [workflows, setWorkflows] = useState<WorkflowItem[]>([]);
 
-  const fetchWorkflows = async () => {
+ 
+
+  useEffect(() => {
+    fetchWorkflows();
+  }, []);
+
+   const fetchWorkflows = async () => {
     const response = await request({ endpoint: API_URLS.WORKFLOW.LIST });
     if (response.data && response.data.response) {
       setWorkflows(response.data.response.map((w: any) => ({ id: w.id, name: w.name, config: w.config })));
     }
   };
-
-  useEffect(() => {
-    fetchWorkflows();
-  }, []);
 
   const handleNew = () => navigate('/workflows?mode=edit');
   const handleEdit = (id: string) => {

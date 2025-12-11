@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import type { Node } from '../types';
-import { NODE_ICONS, NODE_COLORS, DEFAULT_NODE_ICON, DEFAULT_NODE_COLOR } from '../constants/nodeTypes';
-import '../styles/components/WorkflowNode.css';
+import type { Node } from '../../types';
+import { NODE_ICONS, NODE_COLORS, DEFAULT_NODE_ICON, DEFAULT_NODE_COLOR } from '../../constants/nodeTypes';
+import '../../styles/components/WorkflowNode.css';
 
 interface WorkflowNodeProps {
     node: Node;

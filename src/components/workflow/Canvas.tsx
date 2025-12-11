@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react';
-import type { Node, Connection, NodeType, CanvasState, NodeConfig } from '../types';
+import type { Node, Connection, NodeType, CanvasState, NodeConfig } from '../../types';
 import WorkflowNode from './WorkflowNode';
 import NodeConfigPanel from './NodeConfigPanel';
-import '../styles/components/Canvas.css';
-import useApi from '../shared/api/useAPi';
-import { API_URLS } from '../constants/API_URLS';
+import '../../styles/components/Canvas.css';
+import useApi from '../../shared/api/useAPi';
+import { API_URLS } from '../../constants/API_URLS';
 
 interface CanvasProps {
     nodes: Node[];

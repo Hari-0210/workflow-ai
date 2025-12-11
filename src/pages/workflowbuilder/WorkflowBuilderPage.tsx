@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import NodeLibrary from '../components/NodeLibrary';
-import Canvas from '../components/Canvas';
-import type { Node, Connection } from '../types';
-import useApi from '../shared/api/useAPi';
-import { API_URLS } from '../constants/API_URLS';
+import NodeLibrary from '../../components/workflow/NodeLibrary';
+import Canvas from '../../components/workflow/Canvas';
+import type { Node, Connection } from '../../types';
+import useApi from '../../shared/api/useAPi';
+import { API_URLS } from '../../constants/API_URLS';
 import { AppBar, Toolbar, TextField, Button } from '@mui/material';
 import { useSearchParams, useLocation } from 'react-router-dom';
 
@@ -138,7 +138,7 @@ export default function WorkflowBuilderPage() {
         </AppBar>
       )}
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        <NodeLibrary onLoadWorkflow={onLoadWorkflow} />
+        <NodeLibrary  />
         <Canvas
           nodes={nodes}
           connections={connections}

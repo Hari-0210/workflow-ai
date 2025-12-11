@@ -1,8 +1,5 @@
-import type { NodeType } from '../types';
-import '../styles/components/NodeLibrary.css';
-import useApi from '../shared/api/useAPi';
-import { useEffect, useState } from 'react';
-import { API_URLS } from '../constants/API_URLS';
+import type { NodeType } from '../../types';
+import '../../styles/components/NodeLibrary.css';
 
 const nodeTypes: NodeType[] = [
     {
@@ -33,32 +30,12 @@ const nodeTypes: NodeType[] = [
 
 const categories = ['Start', 'Actions', 'Logic', 'Data'];
 
-interface NodeLibraryProps {
-    onLoadWorkflow?: (workflow: any) => void;
-}
 
-export default function NodeLibrary({ onLoadWorkflow }: NodeLibraryProps) {
 
-    const { request } = useApi<any>();
+export default function NodeLibrary() {
 
-    const [existingWorkflow, setExistingWorkflow] = useState<any>([]);
 
-    const fetchWorkflow = async () => {
-        try {
-            const response = await request({
-                endpoint: API_URLS.WORKFLOW.LIST,
-            });
-            if (response.data && response.data.response) {
-                setExistingWorkflow(response.data.response);
-            }
-        } catch (error) {
-            console.error("Failed to fetch workflows", error);
-        }
-    }
-
-    useEffect(() => {
-        fetchWorkflow()
-    }, [])
+  
 
     const handleDragStart = (e: React.DragEvent, nodeType: NodeType) => {
         e.dataTransfer.setData('application/nodeType', JSON.stringify(nodeType));
@@ -103,18 +80,7 @@ export default function NodeLibrary({ onLoadWorkflow }: NodeLibraryProps) {
             </div>
 
 
-            {existingWorkflow.length > 0 && (
-                <div className="workflow-list-section">
-                    <h3 className="category-title">Existing Workflows</h3>
-                    <div className="workflow-list">
-                        {existingWorkflow.map((workflow: any) => (
-                            <div key={workflow.id} className="workflow-item" onClick={() => onLoadWorkflow?.(workflow)}>
-                                <div className="workflow-item-name">{workflow.name}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+            
             <br />
         </div>
     );

@@ -92,7 +92,7 @@
     position: absolute;
     bottom: var(--spacing-lg);
     left: var(--spacing-lg);
-    width: 380px;
+    width: 80%;
     max-height: 40vh;
     background: var(--bg-secondary);
     border: 1px solid var(--glass-border);
