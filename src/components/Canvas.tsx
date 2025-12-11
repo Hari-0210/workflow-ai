@@ -40,14 +40,9 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
     const [isExecuting, setIsExecuting] = useState(false);
     const pollingRef = useRef<number | null>(null);
     const { request } = useApi<any>();
-    const [logs, setLogs] = useState<string[]>([]);
-    const appendLog = (entry: any) => {
-        try {
-            const text = typeof entry === 'string' ? entry : JSON.stringify(entry);
-            setLogs(prev => [...prev, text]);
-        } catch {
-            setLogs(prev => [...prev, String(entry)]);
-        }
+    const [logs, setLogs] = useState<{ ts: number; data: unknown }[]>([]);
+    const appendLog = (entry: unknown) => {
+        setLogs(prev => [...prev, { ts: Date.now(), data: entry }]);
     };
     const clearLogs = () => setLogs([]);
 
@@ -446,8 +441,8 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                         y2="0"
                         gradientUnits="userSpaceOnUse"
                     >
-                        <stop offset="0%" stopColor="#667eea" />
-                        <stop offset="100%" stopColor="#4facfe" />
+                        <stop offset="0%" stopColor="#D1D5DB" />
+                        <stop offset="100%" stopColor="#D1D5DB" />
                     </linearGradient>
                 </defs>
 
@@ -474,9 +469,65 @@ export default function Canvas({ nodes, connections, onNodesChange, onConnection
                     <button className="log-clear" onClick={clearLogs} disabled={!logs.length}>Clear</button>
                 </div>
                 <div className="log-content">
-                    {logs.map((l, i) => (
-                        <pre key={i} className="log-item">{l}</pre>
-                    ))}
+                    {logs.map((log, i) => {
+                        const d = log.data;
+                        const ts = new Date(log.ts).toLocaleTimeString();
+                        if (Array.isArray(d)) {
+                            const rows = d.slice(0, 50) as unknown[];
+                            const keys = Array.from(new Set(rows.flatMap(r => (r && typeof r === 'object' && !Array.isArray(r)) ? Object.keys(r as Record<string, unknown>) : [])));
+                            return (
+                                <div key={i} className="log-section">
+                                    <div className="log-section-title">{ts}</div>
+                                    <table className="log-table">
+                                        <thead>
+                                            <tr>
+                                                {keys.map(k => (<th className="log-th" key={k}>{k}</th>))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {rows.map((r, idx) => (
+                                                <tr key={idx} className="log-tr">
+                                                    {keys.map(k => {
+                                                        const val = (r as Record<string, unknown>)[k];
+                                                        const text = typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val ?? '');
+                                                        return <td className="log-td" key={k}>{text}</td>;
+                                                    })}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            );
+                        } else if (d && typeof d === 'object') {
+                            const obj = d as Record<string, unknown>;
+                            const keys = Object.keys(obj);
+                            return (
+                                <div key={i} className="log-section">
+                                    <div className="log-section-title">{ts}</div>
+                                    <table className="log-table kv">
+                                        <tbody>
+                                            {keys.map(k => {
+                                                const val = obj[k];
+                                                const text = typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val ?? '');
+                                                return (
+                                                    <tr key={k}>
+                                                        <th className="log-th">{k}</th>
+                                                        <td className="log-td">{text}</td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            );
+                        }
+                        return (
+                            <div key={i} className="log-section">
+                                <div className="log-section-title">{ts}</div>
+                                <pre className="log-item">{String(d)}</pre>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

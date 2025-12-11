@@ -90,6 +90,7 @@ export default function WorkflowBuilderPage() {
         setWorkflowId(res.data.id || res.data.workflowId);
       }
     }
+    handleNewWorkflow()
   };
 
   const handleDeleteWorkflow = async () => {

@@ -1,13 +1,11 @@
 .workflow-node {
     position: absolute;
     width: 200px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 2px solid var(--glass-border);
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
     border-radius: var(--border-radius);
     cursor: grab;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-sm);
     user-select: none;
     will-change: transform;
 }
@@ -20,9 +18,8 @@
 }
 
 .workflow-node:hover {
-    border-color: var(--node-color);
-    box-shadow: var(--shadow-lg), 0 0 20px var(--node-color);
-    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
 }
 
 .workflow-node:active {
@@ -30,8 +27,8 @@
 }
 
 .workflow-node.selected {
-    border-color: var(--node-color);
-    box-shadow: var(--shadow-lg), 0 0 30px var(--node-color);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
 }
 
 .node-content {
@@ -40,13 +37,12 @@
 }
 
 .node-icon {
-    font-size: 32px;
+    font-size: 24px;
     margin-bottom: var(--spacing-sm);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .node-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: var(--spacing-xs);
@@ -85,13 +81,12 @@
 }
 
 .port-dot {
-    width: 14px;
-    height: 14px;
-    background: var(--bg-tertiary);
-    border: 3px solid var(--node-color);
+    width: 10px;
+    height: 10px;
+    background: #f9fafb;
+    border: 2px solid #d1d5db;
     border-radius: 50%;
     transition: all var(--transition-fast);
-    box-shadow: 0 0 0 0 var(--node-color);
 }
 
 @keyframes pulse {
